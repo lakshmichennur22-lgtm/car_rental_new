@@ -2,34 +2,31 @@ pipeline {
     agent any
 
     environment {
-        AWS_REGION         = "us-east-1"
-        AWS_DEFAULT_REGION = "us-east-1"
-        CLUSTER_NAME       = "car-rental-portal-dev-use-cluster"
-        SERVICE_NAME       = "frontend"
+        AWS_REGION   = "us-east-1"
+        CLUSTER_NAME = "car-rental-portal-dev-use-cluster"   // ✅ ECS cluster
+        SERVICE_NAME = "frontend"                            // ✅ ECS service
     }
 
     stages {
-
         stage('Deploy to ECS') {
             steps {
                 withCredentials([[
                     $class: 'AmazonWebServicesCredentialsBinding',
                     credentialsId: 'Adithya'
                 ]]) {
-
                     sh '''
                     aws sts get-caller-identity
 
                     aws ecs update-service \
-                        --cluster ${CLUSTER_NAME} \
-                        --service ${SERVICE_NAME} \
-                        --force-new-deployment \
-                        --region ${AWS_REGION}
+                      --cluster ${CLUSTER_NAME} \
+                      --service ${SERVICE_NAME} \
+                      --force-new-deployment \
+                      --region ${AWS_REGION}
 
                     aws ecs wait services-stable \
-                        --cluster ${CLUSTER_NAME} \
-                        --services ${SERVICE_NAME} \
-                        --region ${AWS_REGION}
+                      --cluster ${CLUSTER_NAME} \
+                      --services ${SERVICE_NAME} \
+                      --region ${AWS_REGION}
                     '''
                 }
             }
@@ -38,7 +35,7 @@ pipeline {
 
     post {
         success {
-            echo "🚀 Deployment Successful! ECS Running New Frontend Image"
+            echo "🚀 Deployment Successful!"
         }
         failure {
             echo "❌ Deployment Failed!"
